@@ -55,9 +55,9 @@ int main() {
     int choice,i;
     FILE *inputFile, *outputFile;
 
-    generateRandomNumbersToFile("C:\\Users\\autocad\\Documents\\input.txt");
+    generateRandomNumbersToFile("input.txt");
 
-    inputFile = fopen("C:\\Users\\autocad\\Documents\\input.txt", "r");
+    inputFile = fopen("input.txt", "r");
     if (inputFile == NULL) {
         printf("Error opening input file.\n");
         return 1;
@@ -89,7 +89,7 @@ int main() {
         return 1;
     }
 
-    outputFile = fopen("C:\\Users\\autocad\\Documents\\output.txt", "w");
+    outputFile = fopen("output.txt", "w");
     if (outputFile == NULL) {
         printf("Error opening output file.\n");
         return 1;

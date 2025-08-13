@@ -1,0 +1,173 @@
+#include <stdio.h>
+
+#include <stdlib.h>
+ 
+typedef struct {
+
+    int src, dest, weight;
+
+} Edge;
+ 
+typedef struct {
+
+    int V, E;
+
+    Edge* edges;
+
+} Graph;
+ 
+typedef struct {
+
+    int parent, rank;
+
+} Subset;
+ 
+Graph* createGraph(int V, int E) {
+
+    Graph* graph = malloc(sizeof(Graph));
+
+    graph->V = V;
+
+    graph->E = E;
+
+    graph->edges = malloc(E * sizeof(Edge));
+
+    return graph;
+
+}
+ 
+int find(Subset subsets[], int i) {
+
+    if (subsets[i].parent != i)
+
+        subsets[i].parent = find(subsets, subsets[i].parent);
+
+    return subsets[i].parent;
+
+}
+ 
+void unionSets(Subset subsets[], int x, int y) {
+
+    int xroot = find(subsets, x);
+
+    int yroot = find(subsets, y);
+
+    if (xroot != yroot) {
+
+        if (subsets[xroot].rank < subsets[yroot].rank)
+
+            subsets[xroot].parent = yroot;
+
+        else if (subsets[xroot].rank > subsets[yroot].rank)
+
+            subsets[yroot].parent = xroot;
+
+        else {
+
+            subsets[yroot].parent = xroot;
+
+            subsets[xroot].rank++;
+
+        }
+
+    }
+
+}
+ 
+int compareEdges(const void* a, const void* b) {
+
+    return ((Edge*)a)->weight - ((Edge*)b)->weight;
+
+}
+ 
+void kruskalMST(Graph* graph) {
+
+    int V = graph->V;
+
+    Edge* result = malloc((V - 1) * sizeof(Edge));
+
+    int e = 0, i = 0;
+ 
+    qsort(graph->edges, graph->E, sizeof(Edge), compareEdges);
+ 
+    Subset* subsets = malloc(V * sizeof(Subset));
+
+    for (int v = 0; v < V; v++) {
+
+        subsets[v].parent = v;
+
+        subsets[v].rank = 0;
+
+    }
+ 
+    while (e < V - 1 && i < graph->E) {
+
+        Edge next = graph->edges[i++];
+
+        int x = find(subsets, next.src);
+
+        int y = find(subsets, next.dest);
+ 
+        if (x != y) {
+
+            result[e++] = next;
+
+            unionSets(subsets, x, y);
+
+        }
+
+    }
+ 
+    int cost = 0;
+
+    printf("\nEdges in MST:\n");
+
+    for (i = 0; i < e; i++) {
+
+        printf("%d -- %d == %d\n", result[i].src, result[i].dest, result[i].weight);
+
+        cost += result[i].weight;
+
+    }
+
+    printf("Total Cost: %d\n", cost);
+ 
+    free(result);
+
+    free(subsets);
+
+}
+ 
+int main() {
+
+    int V, E;
+
+    printf("Vertices: ");
+
+    scanf("%d", &V);
+
+    printf("Edges: ");
+
+    scanf("%d", &E);
+ 
+    Graph* graph = createGraph(V, E);
+ 
+    printf("Enter edges (src dest weight):\n");
+
+    for (int i = 0; i < E; i++) {
+
+        scanf("%d %d %d", &graph->edges[i].src, &graph->edges[i].dest, &graph->edges[i].weight);
+
+    }
+ 
+    kruskalMST(graph);
+ 
+    free(graph->edges);
+
+    free(graph);
+ 
+    return 0;
+
+}
+
+ 
